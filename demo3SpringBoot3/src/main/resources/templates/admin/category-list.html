@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Category List</title>
+</head>
+<body>
+
+<a th:href="@{/admin/categories/add}">Add Category</a>
+
+<!-- Hiển thị thông báo -->
+<div th:if="${message != null}">
+    <i th:text="${message}"></i>
+</div>
+
+<!-- Form tìm kiếm -->
+<form th:action="@{/admin/categories/searchpaginated}" method="get">
+    <input type="text" name="name" id="name" placeholder="Nhập từ khóa để tìm" />
+    <button type="submit">Search</button>
+</form>
+
+<!-- Hiển thị bảng danh mục -->
+<div th:if="${categoryPage != null and categoryPage.hasContent()}">
+    <!-- Bảng cho kết quả tìm kiếm -->
+    <table border="1" width="100%">
+        <tr>
+            <th>STT</th>
+            <th>Images</th>
+            <th>CategoryID</th>
+            <th>CategoryName</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+        <tr th:each="cate, STT : ${categoryPage.content}">
+            <td th:text="${STT.index + 1}">1</td>
+            <td>
+                <img th:src="${cate.images}" height="150" width="200" th:if="${cate.images != null}" />
+            </td>
+            <td th:text="${cate.id}"></td>
+            <td th:text="${cate.name}"></td>
+            <td>
+                <span th:text="${cate.status == 1 ? 'Hoạt động' : 'Khóa'}"></span>
+            </td>
+            <td>
+                <a th:href="@{/admin/categories/edit/{id}(id=${cate.id})}">Sửa</a> |
+                <a th:href="@{/admin/categories/delete/{id}(id=${cate.id})}">Xóa</a>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div th:if="${!categoryPage.hasContent()}">
+    <!-- Bảng hiển thị toàn bộ danh mục khi không có tìm kiếm -->
+    <table border="1" width="100%">
+        <tr>
+            <th>STT</th>
+            <th>Images</th>
+            <th>CategoryID</th>
+            <th>CategoryName</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+        <tr th:each="cate, STT : ${list}">
+            <td th:text="${STT.index + 1}">1</td>
+            <td>
+                <img th:src="${cate.images}" height="150" width="200" th:if="${cate.images != null}" />
+            </td>
+            <td th:text="${cate.id}"></td>
+            <td th:text="${cate.name}"></td>
+            <td>
+                <span th:text="${cate.status == 1 ? 'Hoạt động' : 'Khóa'}"></span>
+            </td>
+            <td>
+                <a th:href="@{/admin/categories/edit/{id}(id=${cate.id})}">Sửa</a> |
+                <a th:href="@{/admin/categories/delete/{id}(id=${cate.id})}">Xóa</a>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<!-- Phân trang -->
+<form action="">
+    Page size:
+    <select name="size" id="size" onchange="this.form.submit()">
+        <option th:value="3" th:selected="${categoryPage.size == 3}">3</option>
+        <option th:value="5" th:selected="${categoryPage.size == 5}">5</option>
+        <option th:value="10" th:selected="${categoryPage.size == 10}">10</option>
+        <option th:value="15" th:selected="${categoryPage.size == 15}">15</option>
+        <option th:value="20" th:selected="${categoryPage.size == 20}">20</option>
+    </select>
+</form>
+
+<!-- Liên kết các trang trong kết quả tìm kiếm -->
+<ul th:if="${categoryPage.totalPages > 1}">
+    <li th:each="pageNumber : ${pageNumbers}"
+        th:classappend="${pageNumber == categoryPage.number + 1} ? 'page-item active' : 'page-item'">
+        <a th:href="@{/admin/categories/searchpaginated(name=${name}, size=${categoryPage.size}, page=${pageNumber})}" 
+           th:text="${pageNumber}">1</a>
+    </li>
+</ul>
+
+</body>
+</html>
